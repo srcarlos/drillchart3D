@@ -133,6 +133,42 @@ DrillChart3D.init = function() {
 };
 
 
+// function to generating coordinates axis
+DrillChart3D.generatingAxis = function(axesHeight) {
+
+
+
+    // ejes de coordenadas
+    if (axesHeight == undefined || axesHeight == null) axesHeight = 300;
+
+    var axesPosition = {
+        x: 0,
+        y: 0,
+        z: 0
+    };
+    var boxHeight = axesHeight / 8;
+    DrillChart3D.axes = new THREE.AxisHelper(axesHeight);
+    DrillChart3D.axes.position = axesPosition;
+    DrillChart3D.scene.add(DrillChart3D.axes);
+
+    DrillChart3D.gridXZ = new THREE.GridHelper(axesHeight, boxHeight);
+    //  DrillChart3D.gridXZ.setColors(new THREE.Color(0x000000), new THREE.Color(0x000000));
+    DrillChart3D.gridXZ.position.set(axesHeight, 0, axesHeight);
+    DrillChart3D.scene.add(DrillChart3D.gridXZ);
+
+
+    DrillChart3D.gridXY = new THREE.GridHelper(axesHeight, boxHeight);
+    DrillChart3D.gridXY.position.set(axesHeight, axesHeight, 0);
+    DrillChart3D.gridXY.rotation.x = Math.PI / 2;
+    //  DrillChart3D.gridXY.setColors(new THREE.Color(0x000000), new THREE.Color(0x000000));
+    DrillChart3D.scene.add(DrillChart3D.gridXY);
+
+    DrillChart3D.gridYZ = new THREE.GridHelper(axesHeight, boxHeight);
+    DrillChart3D.gridYZ.position.set(0, axesHeight, axesHeight);
+    DrillChart3D.gridYZ.rotation.z = Math.PI / 2;
+    //   DrillChart3D.gridYZ.setColors(new THREE.Color(0x000000), new THREE.Color(0x000000));
+    DrillChart3D.scene.add(DrillChart3D.gridYZ);
+};
 
 
 
