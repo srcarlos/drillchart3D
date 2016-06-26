@@ -32,9 +32,9 @@ DrillChart3D.objects = [];
 DrillChart3D.CollectionRotation = [];
 DrillChart3D.axesHeight = 1000;
 DrillChart3D.viewPositions = {
-    x: DrillChart3D.axesHeight * 1.5,
-    y: DrillChart3D.axesHeight * 2.5,
-    z: DrillChart3D.axesHeight * 2.5
+    x: DrillChart3D.axesHeight,
+    y: DrillChart3D.axesHeight,
+    z: DrillChart3D.axesHeight
 };
 
 
@@ -62,32 +62,51 @@ DrillChart3D.cube   = {};
 
 
 
-DrillChart3D.init = function() {
+DrillChart3D.init = function(config) {
 
     console.log('DrillChart3D VERSION 001-2016');
 
     // SCENE
     DrillChart3D.scene = new THREE.Scene();
-    // CAMERA
-    DrillChart3D.SCREEN_WIDTH = window.innerWidth;
-    DrillChart3D.SCREEN_HEIGHT = window.innerHeight;
+   
+
+    if (config.fullScreen) {
+      DrillChart3D.SCREEN_WIDTH = window.innerWidth;
+      DrillChart3D.SCREEN_HEIGHT = window.innerHeight;
+    }else {
+        DrillChart3D.SCREEN_WIDTH = 300;
+        DrillChart3D.SCREEN_HEIGHT = 300;
+    }
 
 
-    DrillChart3D.scene.fog = new THREE.FogExp2(0xcce0ff, 0.0003);
+     // CAMERA
+    if (config.camera) {
 
 
+        DrillChart3D.VIEW_ANGLE = 45,
+        DrillChart3D.ASPECT = DrillChart3D.SCREEN_WIDTH / DrillChart3D.SCREEN_HEIGHT,
+        DrillChart3D.NEAR = 1,
+        DrillChart3D.FAR = 20000;
 
-    DrillChart3D.VIEW_ANGLE = 45,
-    DrillChart3D.ASPECT = DrillChart3D.SCREEN_WIDTH / DrillChart3D.SCREEN_HEIGHT,
-    DrillChart3D.NEAR = 1,
-    DrillChart3D.FAR = 20000;
+    } else {
 
-    // POSITION
+
+        DrillChart3D.VIEW_ANGLE = 45,
+        DrillChart3D.ASPECT = DrillChart3D.SCREEN_WIDTH / DrillChart3D.SCREEN_HEIGHT,
+        DrillChart3D.NEAR = 1,
+        DrillChart3D.FAR = 20000;
+
+
+    }
+      // POSITION
     DrillChart3D.camera = new THREE.PerspectiveCamera(DrillChart3D.VIEW_ANGLE, DrillChart3D.ASPECT, DrillChart3D.NEAR, DrillChart3D.FAR);
 
 
+
+
+
     DrillChart3D.scene.add(DrillChart3D.camera);
-    DrillChart3D.camera.position.set(DrillChart3D.viewPositions.x*0.9, DrillChart3D.viewPositions.y*1.1, DrillChart3D.viewPositions.z*1.5);
+  //  DrillChart3D.camera.position.set(DrillChart3D.viewPositions.x, DrillChart3D.viewPositions.y, DrillChart3D.viewPositions.z);
     DrillChart3D.camera.position.set(3932, 4500, 5470);
     DrillChart3D.camera.lookAt(DrillChart3D.scene.position);
 
@@ -103,8 +122,14 @@ DrillChart3D.init = function() {
     DrillChart3D.renderer.setSize(DrillChart3D.SCREEN_WIDTH, DrillChart3D.SCREEN_HEIGHT);
 
     //CONTAINER
-    DrillChart3D.container = document.getElementById('container');
-    DrillChart3D.container.appendChild(DrillChart3D.renderer.domElement);
+    if (config.container) {
+         DrillChart3D.container = document.getElementById(config.container);
+         DrillChart3D.container.appendChild(DrillChart3D.renderer.domElement);
+    } else {
+
+    }
+ 
+    
 
 
     // EVENTS
@@ -127,8 +152,18 @@ DrillChart3D.init = function() {
     // CONTROLS
     DrillChart3D.controls = new THREE.OrbitControls(DrillChart3D.camera, DrillChart3D.renderer.domElement);
 
+    if (config.axis){
+         
+          DrillChart3D.generatingAxis(DrillChart3D.axesHeight);
+     };
+   
 
+   if (!'scatter'.localeCompare(config.type)) {
+    DrillChart3D.chartPoints(DrillChart3D.scene,config.data); //example
+   }
 
+  
+  DrillChart3D.animate();
 
 };
 
@@ -170,7 +205,49 @@ DrillChart3D.generatingAxis = function(axesHeight) {
     DrillChart3D.scene.add(DrillChart3D.gridYZ);
 };
 
+// function to add points
+DrillChart3D.addPointObject = function(scene, points) {
+    var geometry = new THREE.CubeGeometry(10, 10, 10);
+    var object = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
+        color: 0x000000
+    }));
 
+    object.material.ambient = object.material.color;
+    object.castShadow = true;
+    object.receiveShadow = true;
+
+    for (var i = 0; i < points.length; i++) {
+        console.log(points[i]);
+        object.position.copy(points[i]);
+        scene.add(object); // OJO
+    }
+};
+
+
+// function to plot points
+DrillChart3D.chartPoints = function(scene, a, color) {
+
+    var points = [];
+    var vector = {};
+
+    if (color === undefined) color = 0x000000;
+    var geometry = new THREE.SphereGeometry(15, 15, 15);
+    var material = new THREE.MeshLambertMaterial({
+        color: color
+    });
+
+
+    for (var i = 0; i < a.length; i++) {
+        var object = new THREE.Mesh(geometry, material);
+        var vector = new THREE.Vector3(a[i].x, a[i].y, a[i].z);
+        object.position.copy(vector);
+        points.push(vector);
+        scene.add(object);
+    }
+
+
+
+};
 
 // Animate the elements
 // For rendering
@@ -195,5 +272,3 @@ DrillChart3D.update = function() {
 };
 
 
-DrillChart3D.init();
-DrillChart3D.animate();
