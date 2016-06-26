@@ -1,0 +1,24 @@
+{
+  "name": "drillchart3d",
+  "homepage": "https://github.com/srcarlos/drillchart3d",
+  "authors": [
+    "Carlos Marcano clmg1010@gmail.com"
+  ],
+  "description": "Drill Chart 3D",
+  "main": "index.html",
+  "keywords": [
+    "drill",
+    "chart",
+    "canvas",
+    "3d",
+    "oil"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
